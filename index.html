@@ -7,14 +7,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="bg-overlay"></div>
     
     <div id="game-container">
         <header>
             <h1 id="title">WORDLE</h1>
         </header>
-
+        <div id="error-msg" class="error-text"></div>
         <div id="game-over-modal" class="hidden">
-            <h2 id="game-over-message">Oh no! You lost...</h2>
+            <h2 id="game-over-message">Oh no! You lose...</h2>
             <div class="button-container">
                 <button id="try-again-btn">Try Again</button>
                 <button id="give-up-btn">Give Up</button>

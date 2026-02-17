@@ -1,15 +1,16 @@
-const rows = 6;
-const columns = 5;
+let rows = 6;
+let columns = 5;
 let currentRow = 0;
 let currentColumn = 0;
-let word = "HEART"; // The secret word
+let word = "HEART"; 
+let currentPhase = 1; 
+let isAnimating = false;
 
 window.onload = function() {
     initializeBoard();
     initializeKeyboard();
     setupPhysicalKeyboard();
 
-    // The Phase 2 Buttons
     document.getElementById("try-again-btn").addEventListener("click", function() {
         location.reload(); 
     });
@@ -81,9 +82,13 @@ function setupPhysicalKeyboard() {
 }
 
 function processInput(key) {
+    if (isAnimating) return; 
+
     if (key === "Enter") {
-        if (currentColumn === columns) {
+        if (currentPhase === 1 && currentColumn === columns) {
             checkWord();
+        } else if (currentPhase === 3 && currentColumn > 0) { 
+            checkYes(); 
         }
     } else if (key === "⌫") {
         if (currentColumn > 0 && currentColumn <= columns) {
@@ -105,6 +110,9 @@ function processInput(key) {
 }
 
 function checkWord() {
+    if (isAnimating) return; 
+    isAnimating = true; 
+
     let guess = "";
     let currentTileRow = []; 
     
@@ -162,11 +170,11 @@ function checkWord() {
 
     setTimeout(() => {
         if (correctCount === columns) {
-            // Trigger popup if won
             document.getElementById("game-over-modal").classList.remove("hidden");
         } else if (currentRow === rows) {
-            // Trigger popup if lost
             document.getElementById("game-over-modal").classList.remove("hidden");
+        } else {
+            isAnimating = false; 
         }
     }, (columns * 300) + 250); 
 }
@@ -181,13 +189,10 @@ function updateKeyboardClass(letter, className) {
 
 // Phase 2: The Magic Scramble
 function triggerValentineSequence() {
+    document.querySelector("header").style.display = "none"; // Hide Wordle
     document.getElementById("keyboard-container").style.display = "none";
+    document.getElementById("bg-overlay").classList.add("show-bg");
 
-    // Fade the background to a deep romantic red
-    document.body.style.transition = "background-color 2s ease";
-    document.body.style.backgroundColor = "#2b0505"; 
-
-    // The left-justified layout
     const message = [
         ["W", "I", "L", "L", ""],
         ["Y", "O", "U", "", ""],
@@ -213,67 +218,53 @@ function triggerValentineSequence() {
                     tile.classList.remove("correct", "present", "absent");
 
                     if (message[r][c] !== "") {
-                        tile.classList.add("val-text"); // Bright red
+                        tile.classList.add("val-text");
                     } else {
-                        tile.classList.add("val-empty"); // Dark red
+                        tile.classList.add("val-empty");
                     }
                 }, 250);
             }, delay);
         }
     }
 
-    // Wait for the flip to finish, let her read it, then trigger the twist!
     setTimeout(() => {
         triggerBelatedTwist();
     }, 4500); 
 }
 
-// Phase 2.5: The Belated Twist
+// Phase 2.5: The Whispered Twist
 function triggerBelatedTwist() {
     let board = document.getElementById("board");
     
-    // Briefly fade out the board to hide the layout swap
     board.style.transition = "opacity 0.4s ease";
     board.style.opacity = "0";
 
     setTimeout(() => {
-        // Destroy the CSS Grid and switch to Flexbox
         board.innerHTML = ""; 
         board.style.display = "flex";
         board.style.flexDirection = "column";
         board.style.gap = "5px";
-        board.style.alignItems = "flex-start"; // Aligns top rows to the left
-        
-        // Center the whole container
+        board.style.alignItems = "center"; 
         board.style.margin = "0 auto";
-        board.style.width = "fit-content";
+        board.style.width = "100%";
 
-        // The new custom layout arrays
-        const newLayout = [
+        const topLayout = [
             ["W", "I", "L", "L"],
             ["Y", "O", "U"],
             ["B", "E"],
-            ["M", "Y"],
-            ["B", "E", "L", "A", "T", "E", "D"],
-            ["V", "A", "L", "E", "N", "T", "I", "N", "E", "?"]
+            ["M", "Y"]
         ];
 
-        newLayout.forEach((rowArr, rowIndex) => {
+        let topBlock = document.createElement("div");
+        topBlock.style.display = "flex";
+        topBlock.style.flexDirection = "column";
+        topBlock.style.gap = "5px";
+
+        topLayout.forEach((rowArr) => {
             let rowDiv = document.createElement("div");
             rowDiv.classList.add("twist-row");
+            rowDiv.style.justifyContent = "flex-start"; 
 
-            // Left justify the top 4 rows by overriding flex settings
-            if (rowIndex < 4) {
-                rowDiv.style.justifyContent = "flex-start";
-            }
-
-            // Apply the drop-in animation to the two new giant rows
-            if (rowIndex >= 4) {
-                rowDiv.classList.add("drop-in");
-                rowDiv.style.animationDelay = `${(rowIndex - 3) * 0.4}s`; // Staggered drop
-            }
-
-            // Build the letters
             rowArr.forEach(letter => {
                 let tile = document.createElement("div");
                 tile.classList.add("tile", "val-text");
@@ -281,26 +272,193 @@ function triggerBelatedTwist() {
                 rowDiv.appendChild(tile);
             });
 
-            // Pad the top 4 rows with empty red blocks to keep the square shape
-            if (rowIndex < 4) {
-                let emptyCount = 5 - rowArr.length;
-                for(let i = 0; i < emptyCount; i++){
-                     let emptyTile = document.createElement("div");
-                     emptyTile.classList.add("tile", "val-empty");
-                     rowDiv.appendChild(emptyTile);
-                }
+            let emptyCount = 5 - rowArr.length;
+            for(let i = 0; i < emptyCount; i++){
+                 let emptyTile = document.createElement("div");
+                 emptyTile.classList.add("tile", "val-empty");
+                 rowDiv.appendChild(emptyTile);
             }
+            topBlock.appendChild(rowDiv);
+        });
+        
+        board.appendChild(topBlock);
 
-            board.appendChild(rowDiv);
+        let whisper = document.createElement("div");
+        whisper.innerText = "(belated...)";
+        whisper.classList.add("whisper-text");
+        board.appendChild(whisper);
+
+        let bottomRow = document.createElement("div");
+        bottomRow.classList.add("twist-row", "drop-in");
+        
+        const valRow = ["V", "A", "L", "E", "N", "T", "I", "N", "E", "?"];
+        valRow.forEach(letter => {
+            let tile = document.createElement("div");
+            tile.classList.add("tile", "val-text");
+            tile.innerText = letter;
+            bottomRow.appendChild(tile);
         });
 
-        // Fade the board back in
+        board.appendChild(bottomRow);
         board.style.opacity = "1"; 
 
-        // Move to Phase 3 (The forced "YES" screen)
         setTimeout(() => {
-            console.log("Time for Phase 3!");
-        }, 3000);
+            triggerPhase3();
+        }, 6000);
 
-    }, 400); // Waits for the opacity to hit 0 before rebuilding
+    }, 400); 
+}
+
+// Phase 3: The Forced YES
+function triggerPhase3() {
+    // Smoothly center the whole game container!
+    document.getElementById("game-container").classList.add("center-phase-3");
+
+    currentPhase = 3;
+    columns = 3; 
+    currentRow = 0;
+    currentColumn = 0;
+    isAnimating = false;
+
+    let board = document.getElementById("board");
+    
+    board.style.transition = "opacity 0.5s ease";
+    board.style.opacity = "0";
+
+    setTimeout(() => {
+        board.innerHTML = ""; 
+        
+        let hint = document.createElement("div");
+        hint.innerText = "Will you be my Valentine?";
+        hint.classList.add("final-title"); // Image-accurate font!
+        hint.style.animation = "whisperFade 1s ease forwards"; 
+        hint.style.marginBottom = "20px";
+        board.appendChild(hint);
+
+        let rowDiv = document.createElement("div");
+        rowDiv.classList.add("twist-row");
+        rowDiv.id = "phase3-row"; 
+
+        for (let c = 0; c < columns; c++) {
+            let tile = document.createElement("div");
+            tile.id = "0-" + c.toString(); 
+            tile.classList.add("tile");
+            
+            // Make Phase 3 tiles bigger automatically
+            tile.style.width = "70px";
+            tile.style.height = "70px";
+            tile.style.fontSize = "2.5rem";
+            
+            rowDiv.appendChild(tile);
+        }
+        board.appendChild(rowDiv);
+
+        // For error messages
+        let errMsg = document.getElementById("error-msg");
+        board.appendChild(errMsg);
+
+        let keys = document.getElementsByClassName("key-tile");
+        for (let i = 0; i < keys.length; i++) {
+            keys[i].classList.remove("correct", "present", "absent");
+        }
+
+        document.getElementById("KeyY").classList.add("present");
+        document.getElementById("KeyE").classList.add("present");
+        document.getElementById("KeyS").classList.add("present");
+
+        document.getElementById("keyboard-container").style.display = "flex";
+        board.style.opacity = "1";
+    }, 500);
+}
+
+// Fixed array: Added all the missing commas!
+const errorMessages = [
+    "WHYYY", 
+    "Pleaseee?", 
+    "Sureee? 😭",
+    "Try again...",
+    "BAKETT",
+    "Nuh uh",
+    "hint: 3 letters",
+    "hint: nagsstart sa Y",
+    "hint: ganto spelling: y, e, s",
+    "uhhuuhuhuh"
+];
+let errorIndex = 0;
+
+function checkYes() {
+    let guess = "";
+    for (let c = 0; c < columns; c++) {
+        let currentTile = document.getElementById("0-" + c.toString());
+        if (currentTile.innerText !== "") {
+            guess += currentTile.innerText;
+        }
+    }
+
+    if (guess === "YES") {
+        isAnimating = true; // Lock keyboard
+        
+        // Turn tiles solid red
+        document.getElementById("0-0").classList.add("val-text");
+        document.getElementById("0-1").classList.add("val-text");
+        document.getElementById("0-2").classList.add("val-text");
+
+        // Fade out ONLY the keyboard and error message
+        let keyboard = document.getElementById("keyboard-container");
+        keyboard.style.transition = "opacity 1s ease";
+        keyboard.style.opacity = "0";
+        document.getElementById("error-msg").style.display = "none";
+
+        // Wait for keyboard to disappear, then load the final message beneath the YES
+        setTimeout(() => {
+            keyboard.style.display = "none";
+
+            let finalFadeInContainer = document.createElement("div");
+            finalFadeInContainer.style.opacity = "0";
+            finalFadeInContainer.style.animation = "whisperFade 2s ease forwards";
+            finalFadeInContainer.style.textAlign = "center";
+            finalFadeInContainer.style.marginTop = "30px"; 
+
+            finalFadeInContainer.innerHTML = `
+                <h2 class="final-subtitle">YEEYYYYY</h2>
+                <p class="final-message">You're the best Valentine I could ever ask for!</p>
+                <button class="final-button" onclick="alert('labyu happy motmot hehe')">See you on our date! Click me...</button>
+            `;
+
+            document.getElementById("board-container").appendChild(finalFadeInContainer);
+            createStars();
+        }, 1000);
+
+    } else {
+        // Wrong answer logic (Allows spamming!)
+        let row = document.getElementById("phase3-row");
+        row.classList.remove("shake"); 
+        void row.offsetWidth; 
+        row.classList.add("shake");
+
+        // Wait 400ms for the shake, then show the error message without locking keyboard
+        setTimeout(() => {
+            let errMsg = document.getElementById("error-msg");
+            errMsg.innerText = errorMessages[errorIndex]; 
+            errMsg.style.opacity = "1";
+            errorIndex = (errorIndex + 1) % errorMessages.length; 
+            
+            setTimeout(() => {
+                errMsg.style.opacity = "0";
+            }, 1500);
+        }, 400);
+    }
+}
+
+function createStars() {
+    for (let i = 0; i < 40; i++) {
+        let star = document.createElement("div");
+        star.innerHTML = "✦"; 
+        star.classList.add("star");
+        star.style.left = Math.random() * 100 + "vw";
+        star.style.top = Math.random() * 100 + "vh";
+        star.style.fontSize = (Math.random() * 1.5 + 0.5) + "rem";
+        star.style.animationDelay = Math.random() * 3 + "s";
+        document.body.appendChild(star);
+    }
 }
