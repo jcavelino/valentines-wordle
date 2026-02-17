@@ -2,12 +2,23 @@ let rows = 6;
 let columns = 5;
 let currentRow = 0;
 let currentColumn = 0;
-let word = "HEART"; 
 let currentPhase = 1; 
 let isAnimating = false;
-let shakeTimer = null;      // NEW: Tracks the shake delay
-let errorHideTimer = null;  // NEW: Tracks the fade-out delay
-
+let shakeTimer = null;
+let errorHideTimer = null;
+let word = "LOVER";
+const riggedKeyboard = {
+    'A': 'present',
+    'E': 'present',
+    'I': 'present',
+    'O': 'present',
+    'U': 'present',
+    'S': 'present',
+    'T': 'present',
+    'R': 'present',
+    'M': 'present',
+    'J': 'present',
+}
 window.onload = function() {
     initializeBoard();
     initializeKeyboard();
@@ -118,42 +129,35 @@ function checkWord() {
     let guess = "";
     let currentTileRow = []; 
     
+    // Gather the letters she typed
     for (let c = 0; c < columns; c++) {
         let currentTile = document.getElementById(currentRow.toString() + "-" + c.toString());
         guess += currentTile.innerText;
         currentTileRow.push(currentTile);
     }
 
-    let wordMap = {};
-    for (let i = 0; i < word.length; i++) {
-        let letter = word[i];
-        if (wordMap[letter]) {
-            wordMap[letter] += 1;
-        } else {
-            wordMap[letter] = 1;
-        }
-    }
-
     let statuses = ["absent", "absent", "absent", "absent", "absent"];
     let correctCount = 0;
 
+    // Evaluate the guess using our Troll Dictionary
     for (let c = 0; c < columns; c++) {
-        if (guess[c] === word[c]) {
+        let letter = guess[c];
+        
+        if (letter === word[c]) {
+            // 1. Exact match! Force it to be Green.
             statuses[c] = "correct";
-            wordMap[guess[c]] -= 1; 
             correctCount += 1;
-        }
-    }
-
-    for (let c = 0; c < columns; c++) {
-        if (statuses[c] !== "correct") { 
-            if (word.includes(guess[c]) && wordMap[guess[c]] > 0) {
-                statuses[c] = "present";
-                wordMap[guess[c]] -= 1;
+        } else {
+            // 2. Not an exact match? Look up its rigged color in our dictionary!
+            if (riggedKeyboard[letter]) {
+                statuses[c] = riggedKeyboard[letter];
+            } else {
+                statuses[c] = "absent"; // Default to gray if you didn't list it
             }
         }
     }
 
+    // Trigger the 3D flip animations
     for (let c = 0; c < columns; c++) {
         setTimeout(() => {
             let tile = currentTileRow[c];
@@ -170,6 +174,7 @@ function checkWord() {
     currentRow += 1;
     currentColumn = 0;
 
+    // Check for game over (Modal triggers whether she wins OR loses!)
     setTimeout(() => {
         if (correctCount === columns) {
             document.getElementById("game-over-modal").classList.remove("hidden");
