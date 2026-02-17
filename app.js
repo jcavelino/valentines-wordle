@@ -391,9 +391,18 @@ const errorMessages = [
     "BAKETT",
     "Nuh uh",
     "hint: 3 letters",
+    "brahhh"
     "hint: nagsstart sa Y",
+    "yung color yellow po ang pindutin"
     "hint: ganto spelling: y, e, s",
     "uhhuuhuhuh"
+    "plssssssss"
+    "why nottttt !!"
+    "mag yes ka na raw sabi ko ..."
+    "HUHUHUHUHU"
+    "mauubos din mga messages here .."
+    "yes na ikaw pls !"
+    "type this: yes"
 ];
 let errorIndex = 0;
 
@@ -436,8 +445,8 @@ function checkYes() {
 
             finalFadeInContainer.innerHTML = `
                 <h2 class="final-subtitle">YEEYYYYY</h2>
-                <p class="final-message">You're the best Valentine I could ever ask for!</p>
-                <button class="final-button" onclick="alert('labyu happy motmot hehe')">See you on our date! Click me...</button>
+                <p class="final-message">It's better late than never! I love you ♡</p>
+                <button class="final-button" onclick="alert('labyu bb happy motmot hehe')">See you on our date! Click me...</button>
             `;
 
             document.getElementById("board-container").appendChild(finalFadeInContainer);
