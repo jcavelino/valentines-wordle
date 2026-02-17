@@ -391,17 +391,17 @@ const errorMessages = [
     "BAKETT",
     "Nuh uh",
     "hint: 3 letters",
-    "brahhh"
+    "brahhh",
     "hint: nagsstart sa Y",
-    "yung color yellow po ang pindutin"
+    "yung color yellow po ang pindutin",
     "hint: ganto spelling: y, e, s",
-    "uhhuuhuhuh"
-    "plssssssss"
-    "why nottttt !!"
-    "mag yes ka na raw sabi ko ..."
-    "HUHUHUHUHU"
-    "mauubos din mga messages here .."
-    "yes na ikaw pls !"
+    "uhhuuhuhuh",
+    "plssssssss",
+    "why nottttt !!",
+    "mag yes ka na raw sabi ko ...",
+    "HUHUHUHUHU",
+    "mauubos din mga messages here ..",
+    "yes na ikaw pls !",
     "type this: yes"
 ];
 let errorIndex = 0;
