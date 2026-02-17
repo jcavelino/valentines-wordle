@@ -1,0 +1,63 @@
+/* General Page Styling */
+body {
+    background-color: #121213; /* Classic dark mode background */
+    color: white;
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    border-bottom: 1px solid #3a3a3c;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#title {
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* The Game Board */
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 equal columns */
+    grid-template-rows: repeat(6, 1fr);    /* 6 equal rows */
+    gap: 5px;                              /* Space between tiles */
+    padding: 10px;
+}
+
+.tile {
+    width: 60px;
+    height: 60px;
+    border: 2px solid #3a3a3c; /* Empty tile border */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-sizing: border-box;
+}
+
+/* We'll use these classes later in JavaScript to change colors */
+.correct {
+    background-color: #538d4e; /* Green */
+    border-color: #538d4e;
+}
+
+.present {
+    background-color: #b59f3b; /* Yellow */
+    border-color: #b59f3b;
+}
+
+.absent {
+    background-color: #3a3a3c; /* Gray */
+    border-color: #3a3a3c;
+}
