@@ -199,6 +199,7 @@ function triggerValentineSequence() {
     document.querySelector("header").style.display = "none"; // Hide Wordle
     document.getElementById("keyboard-container").style.display = "none";
     document.getElementById("bg-overlay").classList.add("show-bg");
+    document.getElementById("game-container").classList.add("center-phase-3");
 
     const message = [
         ["W", "I", "L", "L", ""],
