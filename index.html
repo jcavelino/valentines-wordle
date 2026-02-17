@@ -2,10 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Valentine Wordle</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Hello World! Just testing the pipeline.</h1>
+    
+    <div id="game-container">
+        <header>
+            <h1 id="title">WORDLE</h1>
+        </header>
+
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+
+        <div id="keyboard-container"></div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
