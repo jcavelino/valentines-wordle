@@ -22,7 +22,6 @@ function initializeBoard() {
 }
 
 function initializeKeyboard() {
-    // Arrays representing the 3 rows of a standard QWERTY keyboard
     let keyboard = [
         ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
         ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
@@ -39,7 +38,6 @@ function initializeKeyboard() {
             let key = currRow[j];
             keyTile.innerText = key;
             
-            // Assign IDs so we can style Enter and Backspace differently
             if (key === "Enter") {
                 keyTile.id = "Enter";
             } else if (key === "⌫") {
@@ -50,7 +48,6 @@ function initializeKeyboard() {
             
             keyTile.classList.add("key-tile");
             
-            // Listen for taps on the screen
             keyTile.addEventListener("click", function() {
                 processInput(key);
             });
@@ -61,11 +58,10 @@ function initializeKeyboard() {
     }
 }
 
-// Listen for physical keyboard presses
 function setupPhysicalKeyboard() {
     document.addEventListener("keyup", (e) => {
         if (e.code >= "KeyA" && e.code <= "KeyZ") {
-            processInput(e.code[3]); // Extracts just the letter from "KeyA"
+            processInput(e.code[3]); 
         } else if (e.code === "Backspace") {
             processInput("⌫");
         } else if (e.code === "Enter") {
@@ -76,24 +72,25 @@ function setupPhysicalKeyboard() {
 
 // The central brain for handling input from BOTH keyboards
 function processInput(key) {
-    if (key >= "A" && key <= "Z") {
-        if (currentColumn < columns) {
-            let currentTile = document.getElementById(currentRow.toString() + "-" + currentColumn.toString());
-            if (currentTile.innerText === "") {
-                currentTile.innerText = key;
-                currentColumn += 1;
-            }
+    if (key === "Enter") {
+        if (currentColumn === columns) {
+            checkWord();
         }
     } else if (key === "⌫") {
         if (currentColumn > 0 && currentColumn <= columns) {
             currentColumn -= 1;
             let currentTile = document.getElementById(currentRow.toString() + "-" + currentColumn.toString());
             currentTile.innerText = "";
+            currentTile.classList.remove("animate-pop"); // Remove the pop class so it can trigger again later
         }
-    } else if (key === "Enter") {
-        // Only check the word if the row is full
-        if (currentColumn === columns) {
-            checkWord();
+    } else if (key >= "A" && key <= "Z" && key.length === 1) { 
+        if (currentColumn < columns) {
+            let currentTile = document.getElementById(currentRow.toString() + "-" + currentColumn.toString());
+            if (currentTile.innerText === "") {
+                currentTile.innerText = key;
+                currentTile.classList.add("animate-pop"); // Trigger the typing animation
+                currentColumn += 1;
+            }
         }
     }
 }
@@ -102,14 +99,13 @@ function checkWord() {
     let guess = "";
     let currentTileRow = []; 
     
-    // 1. Gather the letters from the current row
+    // 1. Gather the letters
     for (let c = 0; c < columns; c++) {
         let currentTile = document.getElementById(currentRow.toString() + "-" + c.toString());
         guess += currentTile.innerText;
         currentTileRow.push(currentTile);
     }
 
-    // 2. Create a dictionary/object to count how many of each letter are in the target word
     let wordMap = {};
     for (let i = 0; i < word.length; i++) {
         let letter = word[i];
@@ -120,51 +116,63 @@ function checkWord() {
         }
     }
 
-    // 3. First Pass: Check for CORRECT (Green)
+    // 2. Calculate all the colors BEFORE animating
+    let statuses = ["absent", "absent", "absent", "absent", "absent"];
     let correctCount = 0;
+
+    // First Pass: Green
     for (let c = 0; c < columns; c++) {
         if (guess[c] === word[c]) {
-            currentTileRow[c].classList.add("correct");
-            updateKeyboardClass(guess[c], "correct");
-            wordMap[guess[c]] -= 1; // Deduct from our available letter count
+            statuses[c] = "correct";
+            wordMap[guess[c]] -= 1; 
             correctCount += 1;
         }
     }
 
-    // 4. Second Pass: Check for PRESENT (Yellow) or ABSENT (Gray)
+    // Second Pass: Yellow
     for (let c = 0; c < columns; c++) {
-        if (!currentTileRow[c].classList.contains("correct")) { // Skip the green ones
-            // Is it in the word AND do we still have "unmatched" copies of that letter?
+        if (statuses[c] !== "correct") { 
             if (word.includes(guess[c]) && wordMap[guess[c]] > 0) {
-                currentTileRow[c].classList.add("present");
-                updateKeyboardClass(guess[c], "present");
+                statuses[c] = "present";
                 wordMap[guess[c]] -= 1;
-            } else {
-                currentTileRow[c].classList.add("absent");
-                updateKeyboardClass(guess[c], "absent");
             }
         }
     }
 
-    // 5. Move to the next row
+    // 3. The Staggered Animation Loop
+    for (let c = 0; c < columns; c++) {
+        setTimeout(() => {
+            let tile = currentTileRow[c];
+            tile.classList.add("flip"); // Start the CSS flip animation
+
+            // Change the color exactly halfway through the 500ms flip
+            setTimeout(() => {
+                tile.classList.add(statuses[c]);
+                updateKeyboardClass(guess[c], statuses[c]);
+            }, 250);
+
+        }, c * 300); // 300ms delay between each letter flipping
+    }
+
+    // 4. Update row instantly so the user can keep playing while animations run
     currentRow += 1;
     currentColumn = 0;
 
-    // 6. Win/Loss Logic (We will expand this in Phase 2)
-    if (correctCount === columns) {
-        console.log("Game Won!");
-    } else if (currentRow === rows) {
-        console.log("Game Lost!");
-        // This is where we will trigger the "Give Up" / Valentine sequence
-    }
+    // 5. Wait for ALL animations to finish before announcing win/loss
+    setTimeout(() => {
+        if (correctCount === columns) {
+            console.log("Game Won!");
+        } else if (currentRow === rows) {
+            console.log("Game Lost!");
+            // Phase 2 will start right here
+        }
+    }, (columns * 300) + 250); 
 }
 
 function updateKeyboardClass(letter, className) {
     let keyTile = document.getElementById("Key" + letter);
-    
-    // Once a key is green, we don't want to accidentally downgrade it to yellow or gray later
     if (!keyTile.classList.contains("correct")) {
-        keyTile.classList.remove("present"); // Remove yellow if we are upgrading to green
+        keyTile.classList.remove("present"); 
         keyTile.classList.add(className);
     }
 }

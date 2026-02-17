@@ -46,20 +46,20 @@ header {
     box-sizing: border-box;
 }
 
-/* We'll use these classes later in JavaScript to change colors */
+/* We use !important so these colors override the default keyboard gray */
 .correct {
-    background-color: #538d4e; /* Green */
-    border-color: #538d4e;
+    background-color: #538d4e !important;
+    border: none !important;
 }
 
 .present {
-    background-color: #b59f3b; /* Yellow */
-    border-color: #b59f3b;
+    background-color: #b59f3b !important;
+    border: none !important;
 }
 
 .absent {
-    background-color: #3a3a3c; /* Gray */
-    border-color: #3a3a3c;
+    background-color: #3a3a3c !important;
+    border: none !important;
 }
 /* Keyboard Styling */
 #keyboard-container {
@@ -94,6 +94,7 @@ header {
     align-items: center;
     flex: 1; /* Makes all keys flex to fill the row evenly */
     max-width: 45px; /* Standard key width */
+    transition: background-color 0.3s ease;
 }
 
 /* Make Enter and Backspace wider than regular letter keys */
@@ -101,4 +102,30 @@ header {
     flex: 1.5; 
     max-width: 65px;
     font-size: 1rem;
+}
+/* The quick pop effect when a letter is typed */
+@keyframes pop {
+    0% { transform: scale(1); border-color: #3a3a3c; }
+    50% { transform: scale(1.1); border-color: #565758; } /* Tile gets slightly bigger and brighter */
+    100% { transform: scale(1); border-color: #565758; }
+}
+
+.animate-pop {
+    animation: pop 0.1s ease-in-out forwards;
+}
+
+/* The 3D flip effect when pressing Enter */
+@keyframes flip {
+    0% { transform: rotateX(0); }
+    50% { transform: rotateX(90deg); } /* Tile is flat/invisible here */
+    100% { transform: transform: rotateX(0); }
+}
+
+.flip {
+    animation: flip 0.5s ease-in forwards;
+}
+
+/* Let's also make the final colored tiles look a bit nicer by removing the border */
+.correct, .present, .absent {
+    border: none !important; 
 }
