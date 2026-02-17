@@ -14,7 +14,6 @@ header {
     border-bottom: 1px solid #3a3a3c;
     width: 100%;
     text-align: center;
-    margin-bottom: 20px;
 }
 
 #title {
@@ -48,8 +47,11 @@ header {
     display: grid;
     grid-template-columns: repeat(5, 1fr); 
     grid-template-rows: repeat(6, 1fr);    
-    gap: 5px;                              
-    padding: 10px;
+    gap: 5px;
+    padding-left: 10px;
+    padding-right: 10px;                           
+    padding-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .tile {
@@ -84,7 +86,7 @@ header {
 #keyboard-container {
     width: 100%;
     max-width: 700px; 
-    margin: 20px auto 0 auto; 
+    margin: 0px auto 0 auto; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -264,14 +266,17 @@ header {
 
 /* Phase 3 Elements */
 .error-text {
-    color: rgba(255, 255, 255, 0.4); /* Low contrast, faded white/grey */
-    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6); /* Slightly more visible whisper */
+    font-size: 1.1rem; /* Made it slightly bigger! */
     font-style: italic;
-    margin-top: 15px; /* Spaces it nicely below the YES row */
+    margin: 15px 0; /* Exact, uniform spacing above and below */
+    height: 25px; /* FIXED HEIGHT: Prevents the keyboard from ever shifting */
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-    min-height: 20px; /* Prevents the screen from jumping when text appears */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .shake {

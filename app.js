@@ -5,6 +5,8 @@ let currentColumn = 0;
 let word = "HEART"; 
 let currentPhase = 1; 
 let isAnimating = false;
+let shakeTimer = null;      // NEW: Tracks the shake delay
+let errorHideTimer = null;  // NEW: Tracks the fade-out delay
 
 window.onload = function() {
     initializeBoard();
@@ -357,6 +359,9 @@ function triggerPhase3() {
         let errMsg = document.getElementById("error-msg");
         board.appendChild(errMsg);
 
+        errMsg.innerText = "hint: it's already there !!";
+        errMsg.style.opacity = "1";
+
         let keys = document.getElementsByClassName("key-tile");
         for (let i = 0; i < keys.length; i++) {
             keys[i].classList.remove("correct", "present", "absent");
@@ -373,7 +378,7 @@ function triggerPhase3() {
 
 // Fixed array: Added all the missing commas!
 const errorMessages = [
-    "WHYYY", 
+    "uhm.. wrong spelling..?", 
     "Pleaseee?", 
     "Sureee? 😭",
     "Try again...",
@@ -396,22 +401,26 @@ function checkYes() {
     }
 
     if (guess === "YES") {
-        isAnimating = true; // Lock keyboard
+        isAnimating = true; 
         
-        // Turn tiles solid red
         document.getElementById("0-0").classList.add("val-text");
         document.getElementById("0-1").classList.add("val-text");
         document.getElementById("0-2").classList.add("val-text");
 
-        // Fade out ONLY the keyboard and error message
         let keyboard = document.getElementById("keyboard-container");
         keyboard.style.transition = "opacity 1s ease";
         keyboard.style.opacity = "0";
-        document.getElementById("error-msg").style.display = "none";
+        
+        let errMsg = document.getElementById("error-msg");
+        errMsg.style.opacity = "0";
 
-        // Wait for keyboard to disappear, then load the final message beneath the YES
+        // Stop any pending errors from showing up on the final screen
+        clearTimeout(shakeTimer);
+        clearTimeout(errorHideTimer);
+
         setTimeout(() => {
             keyboard.style.display = "none";
+            errMsg.style.display = "none"; // Remove physically for clean spacing
 
             let finalFadeInContainer = document.createElement("div");
             finalFadeInContainer.style.opacity = "0";
@@ -430,28 +439,38 @@ function checkYes() {
         }, 1000);
 
     } else {
-        // Wrong answer logic (Allows spamming!)
+        // --- THE SPAM FIX ---
+        
+        // 1. Immediately cancel any existing timers so they don't overlap
+        clearTimeout(shakeTimer);
+        clearTimeout(errorHideTimer);
+
+        // 2. Hide the error message instantly to reset the UI
+        let errMsg = document.getElementById("error-msg");
+        errMsg.style.opacity = "0";
+
+        // 3. Restart the shake animation perfectly
         let row = document.getElementById("phase3-row");
         row.classList.remove("shake"); 
-        void row.offsetWidth; 
+        void row.offsetWidth; // Force a CSS reflow
         row.classList.add("shake");
 
-        // Wait 400ms for the shake, then show the error message without locking keyboard
-        setTimeout(() => {
-            let errMsg = document.getElementById("error-msg");
+        // 4. Start a fresh timer: wait 400ms for shake to end, THEN show error
+        shakeTimer = setTimeout(() => {
             errMsg.innerText = errorMessages[errorIndex]; 
             errMsg.style.opacity = "1";
             errorIndex = (errorIndex + 1) % errorMessages.length; 
             
-            setTimeout(() => {
-                errMsg.style.opacity = "0";
-            }, 1500);
+            // 5. Hide it again after 1.5 seconds
+            //errorHideTimer = setTimeout(() => {
+            //    errMsg.style.opacity = "0";
+            //}, 1500);
         }, 400);
     }
 }
 
 function createStars() {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 67; i++) {
         let star = document.createElement("div");
         star.innerHTML = "✦"; 
         star.classList.add("star");
