@@ -476,7 +476,7 @@ function createStars() {
         star.classList.add("star");
         star.style.left = Math.random() * 100 + "vw";
         star.style.top = Math.random() * 100 + "vh";
-        star.style.fontSize = (Math.random() * 1.5 + 0.5) + "rem";
+        star.style.fontSize = (Math.random() * 1.5 + 1) + "rem";
         star.style.animationDelay = Math.random() * 3 + "s";
         document.body.appendChild(star);
     }
