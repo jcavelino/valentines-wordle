@@ -8,6 +8,8 @@ body {
     align-items: center;
     margin: 0;
     padding: 0;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 header {
@@ -60,6 +62,7 @@ header {
     padding-right: 10px;                           
     padding-bottom: 10px;
     margin-bottom: 30px;
+    box-sizing: border-box;
 }
 
 .tile {
