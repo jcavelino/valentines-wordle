@@ -355,15 +355,20 @@ header {
 
 /* --- Mobile Keyboard Fixes --- */
 @media (max-width: 600px) {
+    /* This shrinks the container slightly so it doesn't touch the screen edges */
+    #keyboard-container {
+        width: 96%; 
+    }
+
     .key-tile {
-        margin: 2px; /* Shrink the gaps between keys */
-        min-width: 0; /* Remove the rigid 40px minimum so Flexbox can shrink them */
-        height: 55px; /* Make them slightly shorter to save vertical screen space */
-        font-size: 1.2rem; /* Slightly smaller text */
+        margin: 2px; /* Shrinks the gaps between keys */
+        min-width: 0; /* Removes rigid minimums so Flexbox can shrink them */
+        height: 55px; /* Shorter keys to save screen space */
+        font-size: 1.2rem; 
     }
 
     #Enter, #Backspace {
         min-width: 0; 
-        font-size: 0.85rem; /* Ensure the text fits on the smaller action keys */
+        font-size: 0.85rem; 
     }
 }
